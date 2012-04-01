@@ -18,7 +18,7 @@ This project is currently in *early beta* and should be regarded as completely e
 
 * parse_num
 
-Github does not support 'git submodules' at the time of this writing. As a consequence, you will need to put a copy of [parse_num.erl][https://github.com/egarson/parse_num] in the src directory.
+Github does not support 'git submodules' at the time of this writing. As a consequence, you will need to put a copy of [parse_num.erl](https://github.com/egarson/parse_num) in the `src/` directory.
 
 ## License
 
