@@ -5,7 +5,7 @@
 
 expect({ModuleName,FuncName},{Times,Value},Response) ->
     Mock = list_to_atom(util:uuid()),
-    register(Mock, spawn(mock2, loop, [[]])),
+    register(Mock, spawn(mock, loop, [[]])),
     Mock ! {expect,Times,Value},
     ResponseVal = erl_parse:abstract(Response),
     Forms = [{attribute,1,module,ModuleName},
@@ -45,7 +45,7 @@ verify(MockData) when length(MockData) =/= 0 ->
             verify(ActualValue, ExpectedValue, Rest);
         {expect,ExpectedCallValue,ExpectedValue} -> %% We always have an expected (we put it there)
             log("Rest: ~p, ActualValue: ~p, ExpectedValue: ~p~n", [Rest, ActualValue, ExpectedValue]),
-            ExpectedCalls = parse_num_test:parse(ExpectedCallValue),
+            ExpectedCalls = parse_num:parse(ExpectedCallValue),
             verify(ActualCalls, ExpectedCalls, ActualValue, ExpectedValue, Rest)
     end;
 
