@@ -1,0 +1,8 @@
+{application, merlin,
+ [{description, "Mocking library for Erlang"},
+  {vsn, "0.0.1"},
+  {modules, [mock,util]},
+  {registered, []},
+  {applications, [kernel,stdlib]},
+  {env, []}
+ ]}.

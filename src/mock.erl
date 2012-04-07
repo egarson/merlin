@@ -1,4 +1,14 @@
+%%%-----------------------------------------------------------------------------
+%%% @author Edward Garson <egarson@gmail.com>
+%%% @copyright (C) 2012 Edward Garson
+%%% @doc A mocking library for Erlang.
+%%% @end
+%%%
+%%% This source file is distributed under the terms of the MIT license as
+%%% described by the file MIT-LICENSE included with this software.
+%%%------------------------------------------------------------------------------
 -module(mock).
+-author('Edward Garson <egarson@gmail.com>').
 -compile(export_all).
 -import(util, [log/1,log/2]).
 -import(lists,[nth/2,seq/3]).
@@ -46,7 +56,7 @@ verify(MockData) ->
     case Expected of
         {expect,anytime,ExpectedValue} ->
             verify(ActualValue, ExpectedValue, Rest);
-        {expect,ExpectedCallValue,ExpectedValue} -> %% We always have an expected (we put it there)
+        {expect,ExpectedCallValue,ExpectedValue} -> %% We always have an expected: we put it there
             %% log("Rest: ~p, ActualValue: ~p, ExpectedValue: ~p~n", [Rest, ActualValue, ExpectedValue]),
             ExpectedCalls = parse_num:parse(ExpectedCallValue),
             log("ActualCalls: ~p, ExpectedCalls: ~p, ActualValue: ~p, ExpectedValue: ~p, Rest: ~p~n", [ActualCalls, ExpectedCalls, ActualValue, ExpectedValue, Rest]),
