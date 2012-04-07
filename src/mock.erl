@@ -26,17 +26,20 @@ expect({ModuleName,FuncName},{Times,Value},Response) ->
 expect({ModuleName,FuncName},Value,Response) ->
     expect({ModuleName,FuncName},{once,Value},Response).
 
+verify([]) ->
+    ok;
+
 verify(Mock) when not is_list(Mock) ->
     Mock ! {verify,self()},
     receive
         {ok,Data} ->
-            %% log("** BEGIN VERIFY: ~p~n", [Data]),
+            %% log("** verify: ~p~n", [Data]),
             verify(Data);
         Error ->
             log("Error: ~p~n", [Error])
     end;
 
-verify(MockData) when length(MockData) =/= 0 ->
+verify(MockData) ->
     log("Verifying: ~p~n", [MockData]),
     {NextActuals,[Expected|Rest]} = lists:splitwith(fun(E) -> element(1,E) =:= actual end, MockData),
     {actual,ActualCalls,ActualValue} = combine_next_actuals(NextActuals),
@@ -44,20 +47,20 @@ verify(MockData) when length(MockData) =/= 0 ->
         {expect,anytime,ExpectedValue} ->
             verify(ActualValue, ExpectedValue, Rest);
         {expect,ExpectedCallValue,ExpectedValue} -> %% We always have an expected (we put it there)
-            log("Rest: ~p, ActualValue: ~p, ExpectedValue: ~p~n", [Rest, ActualValue, ExpectedValue]),
+            %% log("Rest: ~p, ActualValue: ~p, ExpectedValue: ~p~n", [Rest, ActualValue, ExpectedValue]),
             ExpectedCalls = parse_num:parse(ExpectedCallValue),
+            log("ActualCalls: ~p, ExpectedCalls: ~p, ActualValue: ~p, ExpectedValue: ~p, Rest: ~p~n", [ActualCalls, ExpectedCalls, ActualValue, ExpectedValue, Rest]),
             verify(ActualCalls, ExpectedCalls, ActualValue, ExpectedValue, Rest)
-    end;
+    end.
 
-verify([]) ->
-    ok.
-
-verify(_ActualCalls, _ExpectedCalls, irrelevant, ExpectedValue, Rest) ->
-    verify(irrelevant, ExpectedValue, Rest);
+verify(0, _ExpectedCalls, _ActualValue, _ExpectedValue, _Rest) ->
+	{error,no_calls_received};
 verify(ActualCalls, ExpectedCalls, ActualValue, ExpectedValue, Rest) when ActualCalls == ExpectedCalls ->
     verify(ActualValue, ExpectedValue, Rest);
 verify(ActualCalls, ExpectedCalls,_,_,_) when ActualCalls < ExpectedCalls ->
     {error,unrealized_expectation};
+verify(_ActualCalls, _ExpectedCalls, irrelevant, ExpectedValue, Rest) ->
+    verify(irrelevant, ExpectedValue, Rest);
 verify(_,_,_,_,_) ->
     {error,unexpected_call}.
 
