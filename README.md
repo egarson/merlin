@@ -24,9 +24,9 @@ This project is currently in an *early beta* phase and is largely experimental. 
 
 Merlin currently has a single dependency to [parse_num](https://github.com/egarson/parse_num), a small library I wrote to convert atoms with a 'numeric' representation into scalars.
 
-Running @make build@ will pull down the required libraries and compile all the code.
+Running `make build` will pull down the required libraries and compile all the code.
 
-You should run @make test@ to check that everything went as expected.
+You should run `make test` to check that everything went as expected.
 
 ## License
 
