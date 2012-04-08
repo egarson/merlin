@@ -1,12 +1,20 @@
+%%%-----------------------------------------------------------------------------
+%%% @author Edward Garson <egarson@gmail.com>
+%%% @copyright (C) 2012 Edward Garson
+%%%
+%%% This source file is distributed under the terms of the MIT license as
+%%% described by the file MIT-LICENSE included with this software.
+%%%-----------------------------------------------------------------------------
 -module(mock_tests).
+-author('Edward Garson <egarson@gmail.com>').
 -compile(export_all).
 -include_lib("eunit/include/eunit.hrl").
 -import(lists, [seq/2]).
 -import(util, [log/1,log/2]).
--import(mock, [expect/3,where/2,is_called_with/1,is_called/2,with/1,respond_with/1,verify/1,call_on/2]).
+-import(mock, [expect/3,where/2,is_called/1,is_called/2,with/1,respond_with/1,verify/1,call_on/2]).
 
 basic_mock_test() ->
-    Mock = expect(where(calc,double),is_called_with(Value=5),respond_with(Expected=10)),
+    Mock = expect(where(calc,double),is_called(with(Value=5)),respond_with(Expected=10)),
     Actual = calc:double(Value),
     ?assertEqual(ok, verify(Mock)),
     ?assertEqual(Expected, Actual).
@@ -35,6 +43,11 @@ no_actuals_test() ->
     Mock = expect(where(calc,double),is_called(once,with(5)),respond_with(10)),
     ?assertEqual({error,no_calls_received}, verify(Mock)).
 
+unrealized_expectation_test() ->
+    Mock = expect(where(calc,double),is_called(twice,with(Value=5)),respond_with(10)),
+    calc:double(Value),
+    ?assertEqual({error,unrealized_expectation}, verify(Mock)).
+
 too_many_actuals_test() ->
     Mock = expect(where(calc,double),is_called(once,with(Value=5)),respond_with(Expected=10)),
     calc:double(Value),
@@ -56,14 +69,3 @@ any_number_error_test() ->
     Mock = expect(where(calc,double),is_called(once,with(any_number)),respond_with(not_a_number)),
     calc:double(oops),
     ?assertEqual({error,type_mismatch}, verify(Mock)).
-
-fun_evaluator_test() ->
-    EvenNumber = fun(N) -> N rem 2 == 0 end,
-    Mock = expect(where(number,evaluator),is_called(anytime,with(EvenNumber)),respond_with(even)),
-    ?assertEqual(even, number:evaluator(10)),
-    ?assertEqual(ok, verify(Mock)).
-
-series_test() ->
-    Mock = expect(where(calc,double),is_called(sequentially,with(Values=[2,4,6])),respond_with(Responses=[4,8,12])),
-    ?assertEqual(Responses, lists:map(fun(V) -> calc:double(V) end, Values)),
-    ?assertEqual(ok, verify(Mock)).

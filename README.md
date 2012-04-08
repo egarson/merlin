@@ -16,9 +16,11 @@ Mocking was introduced introduced at OOPSLA 2004 along with the paper [Mock Role
 
 [Meck](https://github.com/eproxus/meck) is another mocking framework for Erlang. Meck is is a full-blown OTP application with EasyMock-style syntax, while Merlin is a lightweight library with a JMock-style syntax.
 
+Meck has a large community, healthy adoption and has more capabilities than Merlin: it is probably what you should use for your mocking needs. I only put this out there for fun, and because I've been hacking on it intermittently since 2009. Had I based the syntax on EasyMock, I would not have open-sourced it in light of Meck. However there are enough differences in the simple case that I thought to share it for interest's sake.
+
 ## State of Affairs
 
-This project is currently in an *early beta* phase and is largely experimental. Although the programmatic interface will likely remain relatively stable, the internal implementation is subject to change.
+This project is in an *early beta* phase (despite its age) and is largely experimental. Although the existing programmatic interface will likely remain stable, I do not guarantee it at this juncture: use it at your refactoring peril!
 
 ## Building Merlin
 

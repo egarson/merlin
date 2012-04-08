@@ -1,13 +1,17 @@
+REBAR=`which rebar || ./rebar`
 
 all: clean build test
 
+deps:
+	@$(REBAR) get-deps
+
 clean:
-	@(./rebar clean)
+	@$(REBAR) clean
 
 build:
-	@(./rebar get-deps compile)
+	@$(REBAR) get-deps compile
 
 test:
-	@(./rebar skip_deps=true eunit)
+	@$(REBAR) skip_deps=true eunit
 
 .PHONY: deps test clean build

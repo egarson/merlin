@@ -26,7 +26,7 @@ expect({ModuleName,FuncName},{Times,Value},Response) ->
                 [{op,6,'!',
                   {atom,6,Mock},
                   {tuple,6,
-                   [{atom,6,actual},{var,6,'Actual'}]}}, %% Need Mock?
+                   [{atom,6,actual},{var,6,'Actual'}]}},
                  ResponseVal]}]}],
     {ok,M,Bin} = compile:forms(Forms, [verbose,export_all]),
     code:purge(M),
@@ -55,15 +55,15 @@ verify(MockData) ->
     {actual,ActualCalls,ActualValue} = combine_next_actuals(NextActuals),
     case Expected of
         {expect,anytime,ExpectedValue} ->
+            log("ActualValue: ~p, ExpectedValue: ~p, Rest: ~p~n", [ActualValue, ExpectedValue, Rest]),
             verify(ActualValue, ExpectedValue, Rest);
         {expect,ExpectedCallValue,ExpectedValue} -> %% We always have an expected: we put it there
-            %% log("Rest: ~p, ActualValue: ~p, ExpectedValue: ~p~n", [Rest, ActualValue, ExpectedValue]),
             ExpectedCalls = parse_num:parse(ExpectedCallValue),
             log("ActualCalls: ~p, ExpectedCalls: ~p, ActualValue: ~p, ExpectedValue: ~p, Rest: ~p~n", [ActualCalls, ExpectedCalls, ActualValue, ExpectedValue, Rest]),
             verify(ActualCalls, ExpectedCalls, ActualValue, ExpectedValue, Rest)
     end.
 
-verify(0, _ExpectedCalls, _ActualValue, _ExpectedValue, _Rest) ->
+verify(0,_,_,_,_) ->
 	{error,no_calls_received};
 verify(ActualCalls, ExpectedCalls, ActualValue, ExpectedValue, Rest) when ActualCalls == ExpectedCalls ->
     verify(ActualValue, ExpectedValue, Rest);
@@ -100,18 +100,15 @@ loop(Data) ->
             loop([{expect,Times,Value}|Data]);
 
         {actual,ActualValue} ->
-            %% log("Actual: ~p~n", [ActualValue]),
+            %% log("Actual: ~p, Data: ~p~n", [ActualValue, Data]),
             loop([{actual,ActualValue}|Data]);
 
         Else -> self() ! Else
     end,
     receive
-        {verify,From2} ->
-            From2 ! {ok,Data}
+        {verify,From} ->
+            From ! {ok,Data}
     end.
-
-call_on(M,F) ->
-    where(M,F).
 
 where(ModuleName,FunctionName) ->
     {ModuleName,FunctionName}.
@@ -120,14 +117,10 @@ with(Value) ->
     Value.
 
 is_called(Value) ->
-    is_called(once,Value).
+	Value.
 
 is_called(Times,Value) ->
     {Times,Value}.
-
-%% Decorator for is_called(once,Value) %% update: ha ha, decorator no longer means that
-is_called_with(Value) ->
-    Value.
 
 respond_with(Response) ->
     Response.
